@@ -1,0 +1,225 @@
+package com.example.android.architecture.blueprints.todoapp.ui
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Green
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
+import com.example.android.architecture.blueprints.todoapp.ui.theme.AdvancedAndroidTestingTheme
+import kotlinx.coroutines.launch
+
+class MainActivity : ComponentActivity() {
+    private val viewModel by viewModels<TasksViewModel>()
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            AdvancedAndroidTestingTheme {
+                var openViewDialog by remember { mutableStateOf(false) }
+                var openModal by remember { mutableStateOf(false) }
+                var openModalA by remember { mutableStateOf(false) }
+
+                var tasks by remember { mutableStateOf<List<Task>>(emptyList())}
+
+                viewModel.items.observe(this) { value ->
+                value?.let {
+                    tasks = it
+                }
+            }
+                fun updateOpenModal(modal: Boolean): Unit {
+                    openModal = modal
+                }
+
+                fun updateOpenModalA(modal: Boolean): Unit {
+                    openModalA = modal
+                }
+
+                val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                val scope = rememberCoroutineScope()
+                ModalNavigationDrawer(
+                    drawerState = drawerState,
+                    drawerContent = {
+                        DrawerContent()
+                    },
+                ) {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        topBar = {
+                            TopAppBar(
+                                title = { Text(text = "Advanced Android Testing") },
+                                navigationIcon = {
+                                    IconButton(onClick = {
+                                        //openViewDialog = true
+                                        scope.launch {
+                                            drawerState.open()
+                                        }
+                                    }
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_menu),
+                                            contentDescription = "Filter Menu"
+                                        )
+                                    }
+                                },
+                                actions = {
+                                    IconButton(onClick = { openModal = !openModal }) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.vertical_menu),
+                                            contentDescription = "Filter plants",
+                                            modifier = Modifier.background(Green)
+                                        )
+                                    }
+                                    IconButton(onClick = { openModalA = !openModalA }) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_filter_list_24dp),
+                                            contentDescription = "Filter plants"
+                                        )
+                                    }
+
+                                },
+
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = Green
+                                )
+                            )
+                        },
+                        floatingActionButton = {
+                            ExtendedFloatingActionButton(
+                                text = { Text("Insert", fontSize = 30.sp) },
+                                icon = { Icon(Icons.Filled.Add, contentDescription = "") },
+                                onClick = {
+                                }
+                            )
+                        }
+                    )
+                    { innerPadding ->
+                        Column() {
+                            Text(
+                                "All Tasks",
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                            LazyColumn() {
+                                items(tasks) { task ->
+                                    Row() {
+                                        var isChecked by remember { mutableStateOf( false)}
+                                        CustomCheckbox(isChecked ) { isChecked = it}
+                                        Text(task.title)
+                                    }
+
+                                }
+                            }
+                        }
+                        if (openViewDialog) {
+                            //openAlertDialog.value -> {
+                            AlertDialogExample(
+                                onDismissRequest = { openViewDialog = false },
+                                onConfirmation = {
+                                    openViewDialog = false
+                                    println("Confirmation registered") // Add logic here to handle confirmation.
+                                },
+                                dialogTitle = "Alert dialog example",
+                                dialogText = "This is an example of an alert dialog with buttons.",
+                                icon = Icons.Default.Info
+                            )
+                            //}
+                        }
+                        if (openModal) {
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color =  Color(0Xff000000).copy(alpha = 0.5f)
+                            ) {
+                                Box(
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CustomModal(updateOpenModal = { open ->
+                                        updateOpenModal(open)
+                                    }, openModal = openModal)
+                                }
+                            }
+                            return@Scaffold
+                        }
+                        if (openModalA) {
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color =  Color(0Xff000000).copy(alpha = 0.5f)
+                            ) {
+                                Box(
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CustomModalA(updateOpenModal = { open ->
+                                        updateOpenModalA(open)
+                                    }, openModal = openModalA)
+                                }
+                            }
+                            return@Scaffold
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
