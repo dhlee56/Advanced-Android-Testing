@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -53,12 +54,16 @@ dependencies {
     implementation(libs.androidx.compose.material3)
 
     implementation ("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.navigation:navigation-compose:2.9.7")
     kapt ("androidx.room:room-compiler:$roomVersion")
     implementation ("androidx.room:room-ktx:$roomVersion")
 
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$archLifecycleVersion")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$archLifecycleVersion")
     kapt ("androidx.lifecycle:lifecycle-compiler:$archLifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
