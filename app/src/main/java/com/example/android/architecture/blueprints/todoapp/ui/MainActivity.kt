@@ -51,6 +51,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskScreen
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
 import com.example.android.architecture.blueprints.todoapp.ui.theme.AdvancedAndroidTestingTheme
@@ -76,21 +77,25 @@ class MainActivity : ComponentActivity() {
 object Home
 
 @Serializable
-data class Edit(val taskName: String)
+data class Edit(val taskId: String?)
 @Composable
 fun NavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Home) { // Use the type-safe Home object
         composable<Home> {
             HomeScreen(
-                onNavugateToEditScreen = { taskName ->
-                    navController.navigate(Edit(taskName=taskName)) // Navigate using the type-safe Profile object
+                onNavigateToEditScreen = { it ->
+                    navController.navigate(Edit(taskId=it)) // Navigate using the type-safe Profile object
                 }
             )
         }
         composable<Edit> { backStackEntry ->
             // Retrieve arguments in the destination
             val edit = backStackEntry.toRoute<Edit>()
-            EditScreen(taskName = edit.taskName)
+            AddEditTaskScreen(taskId = edit.taskId,
+                onNavigateToMainScreen = {
+                    navController.navigate(Home)
+                }
+            )
         }
     }
 }
@@ -102,14 +107,9 @@ fun MainScreen() {
     )
 }
 
-@Composable
-fun EditScreen(taskName: String) {
-    Text("Edit Screen $taskName", modifier = Modifier.padding(30.dp))
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onNavugateToEditScreen: (String) -> Unit) {
+fun HomeScreen(onNavigateToEditScreen: (String?) -> Unit) {
     val viewModel: TasksViewModel = viewModel()
     var openViewDialog by remember { mutableStateOf(false) }
     var openModal by remember { mutableStateOf(false) }
@@ -184,7 +184,7 @@ fun HomeScreen(onNavugateToEditScreen: (String) -> Unit) {
                     text = { Text("Insert", fontSize = 30.sp) },
                     icon = { Icon(Icons.Filled.Add, contentDescription = "") },
                     onClick = {
-                        onNavugateToEditScreen("task id")
+                        onNavigateToEditScreen(null)
                     }
                 )
             }
@@ -196,10 +196,12 @@ fun HomeScreen(onNavugateToEditScreen: (String) -> Unit) {
                     modifier = Modifier.padding(innerPadding)
                 )
                 LazyColumn() {
-                    items(tasks) { task ->
+                    items(tasks) { task: Task ->
                         Row() {
                             var isChecked by remember { mutableStateOf( false)}
-                            CustomCheckbox(isChecked ) { isChecked = it}
+                            CustomCheckbox(task.isCompleted) {
+                                viewModel.completeTask(task, it)
+                            }
                             Text(task.title)
                         }
 
