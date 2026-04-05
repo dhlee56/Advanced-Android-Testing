@@ -53,6 +53,7 @@ import androidx.navigation.toRoute
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskScreen
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailScreen
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
 import com.example.android.architecture.blueprints.todoapp.ui.theme.AdvancedAndroidTestingTheme
 import kotlinx.coroutines.launch
@@ -78,6 +79,10 @@ object Home
 
 @Serializable
 data class Edit(val taskId: String?)
+
+
+@Serializable
+data class Detail(val taskId: String?)
 @Composable
 fun NavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Home) { // Use the type-safe Home object
@@ -85,6 +90,9 @@ fun NavGraph(navController: NavHostController) {
             HomeScreen(
                 onNavigateToEditScreen = { it ->
                     navController.navigate(Edit(taskId=it)) // Navigate using the type-safe Profile object
+                },
+                onNavigateToDetailScreen = {
+                    navController.navigate(Detail(taskId=it))
                 }
             )
         }
@@ -97,6 +105,18 @@ fun NavGraph(navController: NavHostController) {
                 }
             )
         }
+        composable<Detail> { backStackEntry ->
+            val detail = backStackEntry.toRoute<Detail>()
+            TaskDetailScreen (
+                taskId = detail.taskId,
+                onNavigateToMainScreen = {
+                    navController.navigate(Home)
+                },
+                onNavigateToEditScreen = {
+                    navController.navigate(Edit(detail.taskId))
+                }
+            )
+        }
     }
 }
 @Composable
@@ -105,154 +125,5 @@ fun MainScreen() {
     NavGraph(
         navController = navController,
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreen(onNavigateToEditScreen: (String?) -> Unit) {
-    val viewModel: TasksViewModel = viewModel()
-    var openViewDialog by remember { mutableStateOf(false) }
-    var openModal by remember { mutableStateOf(false) }
-    var openModalA by remember { mutableStateOf(false) }
-
-    var tasks by remember { mutableStateOf<List<Task>>(emptyList())}
-
-    viewModel.items.observe(LocalLifecycleOwner.current) { value ->
-        value?.let {
-            tasks = it
-        }
-    }
-    fun updateOpenModal(modal: Boolean): Unit {
-        openModal = modal
-    }
-
-    fun updateOpenModalA(modal: Boolean): Unit {
-        openModalA = modal
-    }
-
-    val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerContent()
-        },
-    ) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = "Advanced Android Testing") },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            //openViewDialog = true
-                            scope.launch {
-                                drawerState.open()
-                            }
-                        }
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_menu),
-                                contentDescription = "Filter Menu"
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { openModal = !openModal }) {
-                            Image(
-                                painter = painterResource(id = R.drawable.vertical_menu),
-                                contentDescription = "Filter plants",
-                                modifier = Modifier.background(Green)
-                            )
-                        }
-                        IconButton(onClick = { openModalA = !openModalA }) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_filter_list_24dp),
-                                contentDescription = "Filter plants"
-                            )
-                        }
-
-                    },
-
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Green
-                    )
-                )
-            },
-            floatingActionButton = {
-                ExtendedFloatingActionButton(
-                    text = { Text("Insert", fontSize = 30.sp) },
-                    icon = { Icon(Icons.Filled.Add, contentDescription = "") },
-                    onClick = {
-                        onNavigateToEditScreen(null)
-                    }
-                )
-            }
-        )
-        { innerPadding ->
-            Column() {
-                Text(
-                    "All Tasks",
-                    modifier = Modifier.padding(innerPadding)
-                )
-                LazyColumn() {
-                    items(tasks) { task: Task ->
-                        Row() {
-                            var isChecked by remember { mutableStateOf( false)}
-                            CustomCheckbox(task.isCompleted) {
-                                viewModel.completeTask(task, it)
-                            }
-                            Text(task.title)
-                        }
-
-                    }
-                }
-            }
-            if (openViewDialog) {
-                //openAlertDialog.value -> {
-                AlertDialogExample(
-                    onDismissRequest = { openViewDialog = false },
-                    onConfirmation = {
-                        openViewDialog = false
-                        println("Confirmation registered") // Add logic here to handle confirmation.
-                    },
-                    dialogTitle = "Alert dialog example",
-                    dialogText = "This is an example of an alert dialog with buttons.",
-                    icon = Icons.Default.Info
-                )
-                //}
-            }
-            if (openModal) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color =  Color(0Xff000000).copy(alpha = 0.5f)
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CustomModal(updateOpenModal = { open ->
-                            updateOpenModal(open)
-                        }, openModal = openModal)
-                    }
-                }
-                return@Scaffold
-            }
-            if (openModalA) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color =  Color(0Xff000000).copy(alpha = 0.5f)
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CustomModalA(updateOpenModal = { open ->
-                            updateOpenModalA(open)
-                        }, openModal = openModalA)
-                    }
-                }
-                return@Scaffold
-            }
-        }
-    }
 }
 

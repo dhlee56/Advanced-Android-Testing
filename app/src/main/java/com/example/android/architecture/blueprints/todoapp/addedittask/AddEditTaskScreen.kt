@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
@@ -40,16 +41,27 @@ fun AddEditTaskScreen(taskId: String?,
    onNavigateToMainScreen: () -> Unit
 ) {
     val viewModel: AddEditTaskViewModel = viewModel()
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    viewModel.start(null)
+
+    println("KOTLINCLASS: $taskId")
+    viewModel.start(taskId)
+    var title by remember { mutableStateOf("")}
+    var description by remember { mutableStateOf("")}
+    viewModel.title.observe(LocalLifecycleOwner.current) { value ->
+        value?.let {
+            title = it
+        }
+    }
+    viewModel.description.observe(LocalLifecycleOwner.current) { value ->
+        value?.let {
+            description = it
+        }
+    }
     Scaffold (
         topBar = {
             TopAppBar(
                 title = { Text(text = "New Task") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        println("KOTLINCLASS: $title")
                         onNavigateToMainScreen()
                     }
                     ) {
@@ -68,26 +80,23 @@ fun AddEditTaskScreen(taskId: String?,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    println("KOTLINCLASS: $description")
-                    viewModel.title.value = title
-                    viewModel.description.value = description
                     viewModel.saveTask()
+                    onNavigateToMainScreen()
                 }
             ) {
                Icon(Icons.Filled.Check, "Floating action button")
             }
         }
     ) { innerPadding ->
-
         Column(Modifier.padding(innerPadding)) {
             TextField(
                 value = title,
-                onValueChange = { title = it },
+                onValueChange = { viewModel.title.value = it },
                 label = { Text("Enter your title") }
             )
             TextField(
                 value = description,
-                onValueChange = { description = it },
+                onValueChange = { viewModel.description.value = it },
                 label = { Text("Enter your decription") }
             )
         }
