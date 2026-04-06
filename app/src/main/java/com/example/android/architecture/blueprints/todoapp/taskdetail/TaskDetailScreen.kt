@@ -47,7 +47,10 @@ fun TaskDetailScreen(taskId: String?,
                     Text("Detail Screen")
                 },
                 actions = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        viewModel.deleteTask()
+                        onNavigateToMainScreen()
+                    }) {
                         Image(
                             painter = painterResource(id = R.drawable.trash_icon),
                             contentDescription = "Filter plants",
