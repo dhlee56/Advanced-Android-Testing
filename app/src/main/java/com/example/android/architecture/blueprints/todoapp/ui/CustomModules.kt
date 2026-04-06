@@ -25,10 +25,14 @@ import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
 
 @Composable
 fun CustomModal(updateOpenModal: (Boolean) -> Unit, openModal: Boolean) {
+    val viewModel: TasksViewModel = viewModel()
     Surface(
         color = Green,
         shape = RoundedCornerShape(10.dp) // 원하는 만큼 라운드코너
@@ -37,23 +41,24 @@ fun CustomModal(updateOpenModal: (Boolean) -> Unit, openModal: Boolean) {
             modifier = Modifier.padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("All")
-            Text("Active")
-            Text("Completed")
-            Image(
-                modifier = Modifier
-                    .size(48.dp)
-                    .align(Alignment.End)
-                    .clickable { updateOpenModal(!openModal) },
-                painter = painterResource(id = R.drawable.cancel),
-                contentDescription = "modal_close",
-            )
-            Spacer(modifier = Modifier.height(12.dp))
+            Text("All", modifier = Modifier.clickable {
+                viewModel.setFiltering(TasksFilterType.ALL_TASKS)
+                updateOpenModal(!openModal)
+            })
+            Text("Active", modifier = Modifier.clickable {
+                viewModel.setFiltering(TasksFilterType.ACTIVE_TASKS)
+                updateOpenModal(!openModal)
+            })
+            Text("Completed", modifier = Modifier.clickable {
+                viewModel.setFiltering(TasksFilterType.COMPLETED_TASKS)
+                updateOpenModal(!openModal)
+            })
         }
     }
 }
 @Composable
 fun CustomModalA(updateOpenModal: (Boolean) -> Unit, openModal: Boolean) {
+    val viewModel: TasksViewModel = viewModel()
     Surface(
         color = Green,
         shape = RoundedCornerShape(10.dp) // 원하는 만큼 라운드코너
@@ -62,17 +67,16 @@ fun CustomModalA(updateOpenModal: (Boolean) -> Unit, openModal: Boolean) {
             modifier = Modifier.padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Clear completed")
-            Text("Refresh")
-            Image(
-                modifier = Modifier
-                    .size(48.dp)
-                    .align(Alignment.End)
-                    .clickable { updateOpenModal(!openModal) },
-                painter = painterResource(id = R.drawable.cancel),
-                contentDescription = "modal_close",
-            )
-            Spacer(modifier = Modifier.height(12.dp))
+            Text("Clear completed",
+                modifier = Modifier.clickable {
+                    viewModel.clearCompletedTasks()
+                    updateOpenModal(!openModal)
+                })
+            Text("Refresh",
+                modifier = Modifier.clickable {
+                    viewModel.loadTasks(true)
+                    updateOpenModal(!openModal)
+                })
         }
     }
 }

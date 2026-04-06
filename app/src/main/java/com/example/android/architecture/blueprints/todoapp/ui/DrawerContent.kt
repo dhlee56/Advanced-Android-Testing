@@ -1,9 +1,12 @@
 package com.example.android.architecture.blueprints.todoapp.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
@@ -13,29 +16,42 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Green
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.android.architecture.blueprints.todoapp.R
 
 @Composable
-fun DrawerContent() {
+fun DrawerContent(
+    onNavigateToStatisticsScreen: () -> Unit,
+    onNavigateToMainScreen: () -> Unit
+) {
     ModalDrawerSheet { /* Drawer content */
         Column(
             modifier = Modifier.padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(Modifier.height(12.dp))
-            Text("Drawer Title", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
+            Image(
+                painter = painterResource(id = R.drawable.logo_no_fill),
+                contentDescription = "Filter plants",
+                modifier = Modifier.background(Green).size(100.dp)
+            )
+            Text("Todo App", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleLarge)
             HorizontalDivider()
-
-            Text("Section 1", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.titleMedium)
             NavigationDrawerItem(
-                label = { Text("Item 1") },
+                label = { Text("Statistics") },
                 selected = false,
-                onClick = { /* Handle click */ }
+                onClick = {
+                    onNavigateToStatisticsScreen()
+                }
             )
             NavigationDrawerItem(
-                label = { Text("Item 2") },
+                label = { Text("Task List") },
                 selected = false,
-                onClick = { /* Handle click */ }
+                onClick = {
+                    onNavigateToMainScreen()
+                }
             )}
 
     }

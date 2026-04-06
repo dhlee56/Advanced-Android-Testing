@@ -53,6 +53,7 @@ import androidx.navigation.toRoute
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskScreen
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsScreen
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailScreen
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
 import com.example.android.architecture.blueprints.todoapp.ui.theme.AdvancedAndroidTestingTheme
@@ -83,6 +84,10 @@ data class Edit(val taskId: String?)
 
 @Serializable
 data class Detail(val taskId: String?)
+
+@Serializable
+object Stat
+
 @Composable
 fun NavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Home) { // Use the type-safe Home object
@@ -93,6 +98,22 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onNavigateToDetailScreen = {
                     navController.navigate(Detail(taskId=it))
+                },
+                onNavigateToStatisticsScreen = {
+                    navController.navigate(Stat)
+                },
+                onNavigateToMainScreen = {
+                    navController.navigate(Home)
+                }
+            )
+        }
+        composable<Stat> {
+            StatisticsScreen(
+                onNavigateToStatisticsScreen = {
+                    navController.navigate(Stat)
+                },
+                onNavigateToMainScreen = {
+                    navController.navigate(Home)
                 }
             )
         }

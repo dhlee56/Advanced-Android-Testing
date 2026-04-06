@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Green
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -49,18 +50,24 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     onNavigateToEditScreen: (String?) -> Unit,
-    onNavigateToDetailScreen: (String?) -> Unit
+    onNavigateToDetailScreen: (String?) -> Unit,
+    onNavigateToStatisticsScreen: () -> Unit,
+    onNavigateToMainScreen: () -> Unit
 ) {
     val viewModel: TasksViewModel = viewModel()
-    var openViewDialog by remember { mutableStateOf(false) }
     var openModal by remember { mutableStateOf(false) }
     var openModalA by remember { mutableStateOf(false) }
-
+    var currentFilteringLabel by remember { mutableStateOf(0)}
     var tasks by remember { mutableStateOf<List<Task>>(emptyList())}
 
     viewModel.items.observe(LocalLifecycleOwner.current) { value ->
         value?.let {
             tasks = it
+        }
+    }
+    viewModel.currentFilteringLabel.observe(LocalLifecycleOwner.current) { value ->
+        value?.let {
+            currentFilteringLabel = it
         }
     }
     fun updateOpenModal(modal: Boolean): Unit {
@@ -76,7 +83,9 @@ fun HomeScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            DrawerContent()
+            DrawerContent(
+                onNavigateToStatisticsScreen,
+                onNavigateToMainScreen)
         },
     ) {
         Scaffold(
@@ -86,7 +95,6 @@ fun HomeScreen(
                     title = { Text(text = "Advanced Android Testing") },
                     navigationIcon = {
                         IconButton(onClick = {
-                            //openViewDialog = true
                             scope.launch {
                                 drawerState.open()
                             }
@@ -133,7 +141,7 @@ fun HomeScreen(
         { innerPadding ->
             Column() {
                 Text(
-                    "All Tasks",
+                    LocalContext.current.getString(currentFilteringLabel),
                     modifier = Modifier.padding(innerPadding)
                 )
                 LazyColumn() {
@@ -150,20 +158,6 @@ fun HomeScreen(
 
                     }
                 }
-            }
-            if (openViewDialog) {
-                //openAlertDialog.value -> {
-                AlertDialogExample(
-                    onDismissRequest = { openViewDialog = false },
-                    onConfirmation = {
-                        openViewDialog = false
-                        println("Confirmation registered") // Add logic here to handle confirmation.
-                    },
-                    dialogTitle = "Alert dialog example",
-                    dialogText = "This is an example of an alert dialog with buttons.",
-                    icon = Icons.Default.Info
-                )
-                //}
             }
             if (openModal) {
                 Surface(
