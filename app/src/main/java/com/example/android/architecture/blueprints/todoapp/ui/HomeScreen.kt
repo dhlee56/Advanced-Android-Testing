@@ -59,7 +59,7 @@ fun HomeScreen(
     var openModalA by remember { mutableStateOf(false) }
     var currentFilteringLabel by remember { mutableStateOf(0)}
     var tasks by remember { mutableStateOf<List<Task>>(emptyList())}
-
+    var empty by remember { mutableStateOf(false)}
     viewModel.items.observe(LocalLifecycleOwner.current) { value ->
         value?.let {
             tasks = it
@@ -68,6 +68,11 @@ fun HomeScreen(
     viewModel.currentFilteringLabel.observe(LocalLifecycleOwner.current) { value ->
         value?.let {
             currentFilteringLabel = it
+        }
+    }
+    viewModel.empty.observe(LocalLifecycleOwner.current) { value ->
+        value?.let {
+            empty = it
         }
     }
     fun updateOpenModal(modal: Boolean): Unit {
@@ -140,11 +145,15 @@ fun HomeScreen(
         )
         { innerPadding ->
             Column() {
+                val label = LocalContext.current.getString(currentFilteringLabel)
                 Text(
-                    LocalContext.current.getString(currentFilteringLabel),
+                    label,
                     modifier = Modifier.padding(innerPadding)
                 )
-                LazyColumn() {
+                if(empty) {
+                    Text("No ${label} Tasks")
+                }
+                else LazyColumn() {
                     items(tasks) { task: Task ->
                         Row(Modifier.clickable {
                             println("KOTLINCLASS: task detail ${task.id}")
@@ -159,10 +168,11 @@ fun HomeScreen(
                     }
                 }
             }
+
             if (openModal) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color =  Color(0Xff000000).copy(alpha = 0.5f)
+                    color = Color(0Xff000000).copy(alpha = 0.5f)
                 ) {
                     Box(
                         contentAlignment = Alignment.Center
@@ -177,7 +187,7 @@ fun HomeScreen(
             if (openModalA) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color =  Color(0Xff000000).copy(alpha = 0.5f)
+                    color = Color(0Xff000000).copy(alpha = 0.5f)
                 ) {
                     Box(
                         contentAlignment = Alignment.Center
