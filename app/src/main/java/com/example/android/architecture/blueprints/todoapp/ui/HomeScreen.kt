@@ -151,7 +151,7 @@ fun HomeScreen(
                     modifier = Modifier.padding(innerPadding)
                 )
                 if(empty) {
-                    Text("No ${label} Tasks")
+                    Text("No ${label}")
                 }
                 else LazyColumn() {
                     items(tasks) { task: Task ->
