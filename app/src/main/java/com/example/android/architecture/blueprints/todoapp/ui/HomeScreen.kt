@@ -3,6 +3,7 @@ package com.example.android.architecture.blueprints.todoapp.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,7 +60,10 @@ fun HomeScreen(
     val viewModel: TasksViewModel = viewModel()
     var openModal by remember { mutableStateOf(false) }
     var openModalA by remember { mutableStateOf(false) }
+    var dataLoading by remember { mutableStateOf(false) }
     var currentFilteringLabel by remember { mutableStateOf(0)}
+    var noTasksLabel by remember { mutableStateOf(0)}
+    var noTaskIconRes by remember { mutableStateOf(0)}
     var tasks by remember { mutableStateOf<List<Task>>(emptyList())}
     var empty by remember { mutableStateOf(false)}
     viewModel.items.observe(LocalLifecycleOwner.current) { value ->
@@ -70,9 +76,24 @@ fun HomeScreen(
             currentFilteringLabel = it
         }
     }
+    viewModel.noTasksLabel.observe(LocalLifecycleOwner.current) { value ->
+        value?.let {
+            noTasksLabel = it
+        }
+    }
+    viewModel.noTaskIconRes.observe(LocalLifecycleOwner.current) { value ->
+        value?.let {
+            noTaskIconRes = it
+        }
+    }
     viewModel.empty.observe(LocalLifecycleOwner.current) { value ->
         value?.let {
             empty = it
+        }
+    }
+    viewModel.dataLoading.observe(LocalLifecycleOwner.current) { value ->
+        value?.let {
+            dataLoading = it
         }
     }
     fun updateOpenModal(modal: Boolean): Unit {
@@ -144,31 +165,41 @@ fun HomeScreen(
             }
         )
         { innerPadding ->
-            Column() {
-                val label = LocalContext.current.getString(currentFilteringLabel)
-                Text(
-                    label,
-                    modifier = Modifier.padding(innerPadding)
+            Box(
+                modifier = Modifier.padding(innerPadding),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                if(dataLoading) CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.TopStart),
+                    color = Color.Red
                 )
-                if(empty) {
-                    Text("No ${label}")
-                }
-                else LazyColumn() {
-                    items(tasks) { task: Task ->
-                        Row(Modifier.clickable {
-                            println("KOTLINCLASS: task detail ${task.id}")
-                            onNavigateToDetailScreen(task.id)
-                        }) {
-                            CustomCheckbox(task.isCompleted) {
-                                viewModel.completeTask(task, it)
+                Column(
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    val label = LocalContext.current.getString(currentFilteringLabel)
+                    Text(text=label, fontWeight = FontWeight.Bold)
+                    if(empty) {
+                        val emptyLabel = LocalContext.current.getString(noTasksLabel)
+                        Text(" ${emptyLabel}")
+                        Image(painter = painterResource(noTaskIconRes), contentDescription = "")
+                    }
+                    else LazyColumn() {
+                        items(tasks) { task: Task ->
+                            Row(Modifier.clickable {
+                                println("KOTLINCLASS: task detail ${task.id}")
+                                onNavigateToDetailScreen(task.id)
+                            }) {
+                                CustomCheckbox(task.isCompleted) {
+                                    viewModel.completeTask(task, it)
+                                }
+                                Text(task.title)
                             }
-                            Text(task.title)
-                        }
 
+                        }
                     }
                 }
             }
-
             if (openModal) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
