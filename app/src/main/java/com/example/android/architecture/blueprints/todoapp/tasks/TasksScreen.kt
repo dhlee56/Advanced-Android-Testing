@@ -1,4 +1,4 @@
-package com.example.android.architecture.blueprints.todoapp.ui
+package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -46,12 +45,15 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
+import com.example.android.architecture.blueprints.todoapp.ui.CustomCheckbox
+import com.example.android.architecture.blueprints.todoapp.ui.CustomModal
+import com.example.android.architecture.blueprints.todoapp.ui.CustomModalA
+import com.example.android.architecture.blueprints.todoapp.ui.DrawerContent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun TasksScreen(
     onNavigateToEditScreen: (String?) -> Unit,
     onNavigateToDetailScreen: (String?) -> Unit,
     onNavigateToStatisticsScreen: () -> Unit,
@@ -111,7 +113,8 @@ fun HomeScreen(
         drawerContent = {
             DrawerContent(
                 onNavigateToStatisticsScreen,
-                onNavigateToMainScreen)
+                onNavigateToMainScreen
+            )
         },
     ) {
         Scaffold(

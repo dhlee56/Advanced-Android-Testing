@@ -9,6 +9,7 @@
     <string name="completed_tasks_cleared">Completed tasks cleared</string>
     <string name="task_marked_complete">Task marked complete</string>
     <string name="task_marked_active">Task marked active</string>
+    <string name="no_message">No message</string>
     <string name="empty_task_message">Tasks cannot be empty</string>
     <string name="loading_tasks_error">Error while loading tasks</string>
 </resources>
