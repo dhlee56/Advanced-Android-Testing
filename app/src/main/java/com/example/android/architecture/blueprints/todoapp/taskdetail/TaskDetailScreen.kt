@@ -3,8 +3,10 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -21,7 +23,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -79,16 +83,24 @@ fun TaskDetailScreen(taskId: String?,
             }
         }
         detailTask?.let { task ->
-            Column(Modifier.padding(innerPadding)) {
-                Row() {
-                    CustomCheckbox(task.isCompleted) {
-                        viewModel.setCompleted(it)
-                    }
-                    Text(task.title)
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .background(Color.White)
+            ) {
+                Spacer(Modifier.padding(2.dp))
+                CustomCheckbox(task.isCompleted) {
+                    viewModel.setCompleted(it)
                 }
-                Text(" ${task.description}")
+                Spacer(Modifier.padding(2.dp))
+                Column(verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start) {
+                    Text(task.title)
+                    Text("${task.description}")
+                }
             }
         }
-
     }
 }
