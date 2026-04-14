@@ -26,6 +26,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,6 +50,7 @@ import com.example.android.architecture.blueprints.todoapp.ui.CustomCheckbox
 import com.example.android.architecture.blueprints.todoapp.ui.CustomModal
 import com.example.android.architecture.blueprints.todoapp.ui.CustomModalA
 import com.example.android.architecture.blueprints.todoapp.ui.DrawerContent
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -187,16 +189,33 @@ fun TasksScreen(
                         Text(" ${emptyLabel}")
                         Image(painter = painterResource(noTaskIconRes), contentDescription = "")
                     } else {
-                        LazyColumn() {
-                            items(tasks) { task: Task ->
-                                Row(Modifier.clickable {
-                                    println("KOTLINCLASS: task detail ${task.id}")
-                                    onNavigateToDetailScreen(task.id)
-                                }) {
-                                    CustomCheckbox(task.isCompleted) {
-                                        viewModel.completeTask(task, it)
+                        var isRefreshing by remember { mutableStateOf(false) }
+                        val scope = rememberCoroutineScope()
+
+                        // 2. Wrap scrollable content in PullToRefreshBox
+                        PullToRefreshBox(
+                            isRefreshing = isRefreshing,
+                            onRefresh = {
+                                println("KOTLINCLASS: onReFresh")
+                                scope.launch {
+                                    isRefreshing = true
+                                    viewModel.refresh()
+                                    delay(2000) // Simulate network call
+                                    isRefreshing = false
+                                }
+                            }
+                        ) {
+                            LazyColumn() {
+                                items(tasks) { task: Task ->
+                                    Row(Modifier.clickable {
+                                        println("KOTLINCLASS: task detail ${task.id}")
+                                        onNavigateToDetailScreen(task.id)
+                                    }) {
+                                        CustomCheckbox(task.isCompleted) {
+                                            viewModel.completeTask(task, it)
+                                        }
+                                        Text(task.title)
                                     }
-                                    Text(task.title)
                                 }
                             }
                         }
