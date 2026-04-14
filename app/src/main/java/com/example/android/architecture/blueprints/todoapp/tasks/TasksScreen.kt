@@ -181,24 +181,24 @@ fun TasksScreen(
                     horizontalAlignment = Alignment.Start,
                 ) {
                     val label = LocalContext.current.getString(currentFilteringLabel)
-                    Text(text=label, fontWeight = FontWeight.Bold)
-                    if(empty) {
+                    Text(text = label, fontWeight = FontWeight.Bold)
+                    if (empty) {
                         val emptyLabel = LocalContext.current.getString(noTasksLabel)
                         Text(" ${emptyLabel}")
                         Image(painter = painterResource(noTaskIconRes), contentDescription = "")
-                    }
-                    else LazyColumn() {
-                        items(tasks) { task: Task ->
-                            Row(Modifier.clickable {
-                                println("KOTLINCLASS: task detail ${task.id}")
-                                onNavigateToDetailScreen(task.id)
-                            }) {
-                                CustomCheckbox(task.isCompleted) {
-                                    viewModel.completeTask(task, it)
+                    } else {
+                        LazyColumn() {
+                            items(tasks) { task: Task ->
+                                Row(Modifier.clickable {
+                                    println("KOTLINCLASS: task detail ${task.id}")
+                                    onNavigateToDetailScreen(task.id)
+                                }) {
+                                    CustomCheckbox(task.isCompleted) {
+                                        viewModel.completeTask(task, it)
+                                    }
+                                    Text(task.title)
                                 }
-                                Text(task.title)
                             }
-
                         }
                     }
                 }
