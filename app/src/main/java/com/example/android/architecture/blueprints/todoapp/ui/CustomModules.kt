@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -87,10 +88,16 @@ fun CustomCheckbox(
 ) {
     Box(
         modifier = Modifier
-            .size(24.dp)
-            .clip(RoundedCornerShape(8.dp)) // Custom shape
+            .size(20.dp)
+            .clip(
+                //RoundedCornerShape(8.dp)
+                RectangleShape
+            ) // Custom shape
             .background(if (isChecked) Color.Yellow else White)
-            .border(2.dp, Color.Yellow, RoundedCornerShape(8.dp))
+            .border(2.dp, Color.Black,
+                //RoundedCornerShape(1.dp)
+                RectangleShape
+            )
             .clickable { onValueChange(!isChecked) },
         contentAlignment = Alignment.Center
     ) {

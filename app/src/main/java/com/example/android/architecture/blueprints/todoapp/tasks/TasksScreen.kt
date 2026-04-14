@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,6 +43,7 @@ import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -208,19 +210,23 @@ fun TasksScreen(
                         ) {
                             LazyColumn() {
                                 items(tasks) { task: Task ->
+                                    Spacer(Modifier.padding(2.dp))
                                     Row(Modifier.clickable {
-                                        println("KOTLINCLASS: task detail ${task.id}")
-                                        onNavigateToDetailScreen(task.id)
-                                    }, horizontalArrangement = Arrangement.Start,
+                                            println("KOTLINCLASS: task detail ${task.id}")
+                                            onNavigateToDetailScreen(task.id)
+                                        },
+                                        horizontalArrangement = Arrangement.Start,
                                         verticalAlignment = Alignment.CenterVertically
-                                        ) {
-//                                        CustomCheckbox(task.isCompleted) {
-//                                            viewModel.completeTask(task, it)
-//                                        }
-                                        Checkbox(
-                                            checked = task.isCompleted,
-                                            onCheckedChange = { viewModel.completeTask(task, it) }
-                                        )
+                                    ) {
+                                        Spacer(Modifier.padding(2.dp))
+                                        CustomCheckbox(task.isCompleted) {
+                                            viewModel.completeTask(task, it)
+                                        }
+                                        Spacer(Modifier.padding(2.dp))
+//                                        Checkbox(
+//                                            checked = task.isCompleted,
+//                                            onCheckedChange = { viewModel.completeTask(task, it) }
+//                                        )
                                         Text(task.title)
                                     }
                                 }
