@@ -33,7 +33,7 @@ object TasksRemoteDataSource : TasksDataSource {
 
     private const val SERVICE_LATENCY_IN_MILLIS = 2000L
 
-    private var TASKS_SERVICE_DATA = LinkedHashMap<String, Task>(2)
+    private var TASKS_SERVICE_DATA = LinkedHashMap<String, Task>(36)
 
     init {
         addTask("Build tower in Pisa 1", "Ground looks good, no foundation work required.")

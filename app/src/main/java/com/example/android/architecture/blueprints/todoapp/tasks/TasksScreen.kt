@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -210,10 +211,16 @@ fun TasksScreen(
                                     Row(Modifier.clickable {
                                         println("KOTLINCLASS: task detail ${task.id}")
                                         onNavigateToDetailScreen(task.id)
-                                    }) {
-                                        CustomCheckbox(task.isCompleted) {
-                                            viewModel.completeTask(task, it)
-                                        }
+                                    }, horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                        ) {
+//                                        CustomCheckbox(task.isCompleted) {
+//                                            viewModel.completeTask(task, it)
+//                                        }
+                                        Checkbox(
+                                            checked = task.isCompleted,
+                                            onCheckedChange = { viewModel.completeTask(task, it) }
+                                        )
                                         Text(task.title)
                                     }
                                 }
